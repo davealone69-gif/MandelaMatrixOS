@@ -37,7 +37,7 @@ fun DevatorLabScreen(modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Surface(tonalElevation = 2.dp, modifier = Modifier.fillMaxWidth()) {
-            Column(Modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Science, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(8.dp))
@@ -52,7 +52,7 @@ fun DevatorLabScreen(modifier: Modifier = Modifier) {
             }
         }
 
-        Column(Modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -99,7 +99,7 @@ fun DevatorLabScreen(modifier: Modifier = Modifier) {
         ) {
             items(proposals, key = { it.id }) { p ->
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)) {
-                    Column(Modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(12.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween

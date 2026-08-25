@@ -63,7 +63,7 @@ fun MatrixCoreScreen(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         MandelaVsMatrixBanner(modifier = Modifier.padding(top = 8.dp, bottom = 4.dp))
         Surface(tonalElevation = 2.dp, modifier = Modifier.fillMaxWidth()) {
-            Column(Modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.GridView, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(8.dp))
