@@ -18,13 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
+import com.mandela.matrixos.data.AiSettings
+import com.mandela.matrixos.data.ChatMessage
+import com.mandela.matrixos.data.LlmClient
 import kotlinx.coroutines.launch
 
 data class GeminiMsg(val id: String = System.currentTimeMillis().toString() + (0..99).random(), val role: String, val text: String)
 
 @Composable
 fun GeminiAiScreen(modifier: Modifier = Modifier) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var input by remember { mutableStateOf("") }
     var messages by remember { mutableStateOf(listOf<GeminiMsg>()) }
     var loading by remember { mutableStateOf(false) }
@@ -38,15 +41,34 @@ fun GeminiAiScreen(modifier: Modifier = Modifier) {
     fun send() {
         val t = input.trim()
         if (t.isEmpty() || loading) return
+        val ai = AiSettings.load(context)
         messages = messages + GeminiMsg(role = "user", text = t)
         input = ""
-        loading = true
-        scope.launch {
-            delay(700)
+        if (ai.provider.needsKey && ai.apiKey.isBlank()) {
             messages = messages + GeminiMsg(
                 role = "assistant",
-                text = "[Gemini simulated]\nMatrix synthesis for: \"$t\"\n\nWire a real Gemini API key for live streaming."
+                text = "No ${ai.provider.displayName} key configured.\nOpen the FreeAI tab, paste a free key, tap Save — then ask me again."
             )
+            return
+        }
+        loading = true
+        scope.launch {
+            val result = LlmClient.chat(
+                config = LlmClient.Config(
+                    apiKey = ai.apiKey,
+                    provider = ai.provider,
+                    baseUrl = ai.baseUrl,
+                    model = ai.model
+                ),
+                systemPrompt = "You are the Gemini matrix-synthesis agent of Mandela Matrix OS. " +
+                    "Answer with structured, concise synthesis: key insight first, then details. " +
+                    "Be technical but clear.",
+                userMessage = t,
+                history = messages.map { ChatMessage(role = it.role, content = it.text) }
+            )
+            result
+                .onSuccess { reply -> messages = messages + GeminiMsg(role = "assistant", text = reply) }
+                .onFailure { e -> messages = messages + GeminiMsg(role = "assistant", text = "⚠ ${e.message}") }
             loading = false
         }
     }

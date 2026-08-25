@@ -17,13 +17,12 @@ data class LlmModel(
 
 object FreeModels {
     val list = listOf(
-        LlmModel("llama3-8b-8192", "Llama 3 8B", "Groq", true, "Fast free tier"),
-        LlmModel("llama3-70b-8192", "Llama 3 70B", "Groq", true, "Strong reasoning"),
+        LlmModel("gemini-3.7-flash", "Gemini 3.7 Flash", "Gemini", true, "Google AI free tier — fast default"),
+        LlmModel("llama-3.3-70b-versatile", "Llama 3.3 70B", "Groq", true, "Strong reasoning, free tier"),
+        LlmModel("llama-3.1-8b-instant", "Llama 3.1 8B Instant", "Groq", true, "Fastest free tier"),
         LlmModel("gemma2-9b-it", "Gemma 2 9B", "Groq", true, "Google open model"),
-        LlmModel("mixtral-8x7b-32768", "Mixtral 8x7B", "Groq", true, "Mixture of Experts"),
-        LlmModel("openrouter/free", "OpenRouter Free", "OpenRouter", true, "Rotating free models"),
-        LlmModel("huggingface/zephyr", "Zephyr 7B", "Hugging Face", true, "Instruction tuned"),
-        LlmModel("local/placeholder", "Local (soon)", "On-device", true, "llama.cpp / MLC coming")
+        LlmModel("mistralai/mistral-7b-instruct:free", "Mistral 7B Free", "OpenRouter", true, "Rotating free pool"),
+        LlmModel("local-model", "Local endpoint", "On-device/LAN", true, "Ollama / llama.cpp / LM Studio")
     )
 }
 
