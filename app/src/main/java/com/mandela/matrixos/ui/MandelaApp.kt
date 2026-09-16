@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.*
@@ -37,7 +38,8 @@ enum class MandelaScreen(val title: String, val icon: ImageVector) {
     ImageTools("Image", Icons.Default.Image),
     ApkAuditor("APK", Icons.Default.Verified),
     Training("Train", Icons.Default.School),
-    Swarm("Swarm", Icons.Default.Build)
+    Swarm("Swarm", Icons.Default.Build),
+    BuilderSettings("Builder", Icons.Default.Settings)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,38 +48,14 @@ fun MandelaApp() {
     val screens = MandelaScreen.entries
     val pagerState = rememberPagerState(pageCount = { screens.size })
     val scope = rememberCoroutineScope()
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Mandela Matrix OS • ${screens[pagerState.currentPage].title}") }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            ScrollableTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier.fillMaxWidth(),
-                edgePadding = 8.dp
-            ) {
+    Scaffold(topBar = { TopAppBar(title = { Text("Mandela Matrix OS • ${screens[pagerState.currentPage].title}") }) }) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            ScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth(), edgePadding = 8.dp) {
                 screens.forEachIndexed { index, screen ->
-                    Tab(
-                        selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                        text = { Text(screen.title) },
-                        icon = { Icon(screen.icon, contentDescription = screen.title) }
-                    )
+                    Tab(selected = pagerState.currentPage == index, onClick = { scope.launch { pagerState.animateScrollToPage(index) } }, text = { Text(screen.title) }, icon = { Icon(screen.icon, contentDescription = screen.title) })
                 }
             }
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) { page ->
+            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
                 when (screens[page]) {
                     MandelaScreen.MatrixCore -> MatrixCoreScreen()
                     MandelaScreen.DevatorLab -> DevatorLabScreen()
@@ -90,6 +68,7 @@ fun MandelaApp() {
                     MandelaScreen.ApkAuditor -> ApkAuditorScreen()
                     MandelaScreen.Training -> TrainingCentreScreen()
                     MandelaScreen.Swarm -> SwarmBuilderScreen()
+                    MandelaScreen.BuilderSettings -> BuilderSettingsScreen()
                 }
             }
         }
