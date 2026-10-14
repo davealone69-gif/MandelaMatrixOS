@@ -35,6 +35,13 @@ fun RealApkBuilderScreen(modifier: Modifier = Modifier) {
         scope.launch {
             var health = BuilderBackend.health(url)
             if (!health.ok) {
+                if (!prefs.getBoolean("auto_start", true)) {
+                    status = "OFFLINE"
+                    append("Backend unreachable: ${health.message}")
+                    append("Auto-start is disabled in Builder Settings. Enable it or use the Termux button to start the backend.")
+                    busy = false
+                    return@launch
+                }
                 status = "STARTING TERMUX"
                 append("Backend unreachable: ${health.message}")
                 val launch = TermuxLauncher.launch(context, command)
