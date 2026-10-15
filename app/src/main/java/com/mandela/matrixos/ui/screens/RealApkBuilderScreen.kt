@@ -35,15 +35,22 @@ fun RealApkBuilderScreen(modifier: Modifier = Modifier) {
         scope.launch {
             var health = BuilderBackend.health(url)
             if (!health.ok) {
+                if (!prefs.getBoolean("auto_start", true)) {
+                    status = "OFFLINE"
+                    append("Backend unreachable: ${health.message}")
+                    append("Auto-start is disabled in Builder Settings. Enable it or use the Termux button to start the backend.")
+                    busy = false
+                    return@launch
+                }
                 status = "STARTING TERMUX"
                 append("Backend unreachable: ${health.message}")
                 val launch = TermuxLauncher.launch(context, command)
                 append(launch.message)
                 if (!launch.launched) { status = "OFFLINE"; busy = false; return@launch }
-                repeat(30) {
+                for (attempt in 0 until 30) {
                     delay(1000)
                     health = BuilderBackend.health(url)
-                    if (health.ok) return@repeat
+                    if (health.ok) break
                 }
             }
             if (!health.ok) { status = "OFFLINE"; append("Backend did not become reachable. No build claimed."); busy = false; return@launch }
@@ -52,8 +59,14 @@ fun RealApkBuilderScreen(modifier: Modifier = Modifier) {
             val request = BuilderBackend.buildApk(url, task.trim(), project)
             if (!request.ok) { status = "FAILED"; append("Build request failed: ${request.message}"); busy = false; return@launch }
             val result = request.buildId?.let { BuilderBackend.pollBuild(url, it) } ?: request
-            if (result.ok && result.artifactUrl != null) { status = "REAL + VERIFIED"; append("APK VERIFIED: ${result.artifactUrl}") }
-            else { status = "UNVERIFIED"; append("Backend did not provide a verified artifact. ${result.message}") }
+            if (result.ok && result.artifactUrl != null) {
+                status = "BUILD COMPLETE · ARTIFACT UNVERIFIED"
+                append("Build job completed and the backend returned an artifact URL: ${result.artifactUrl}")
+                append("The app has not downloaded or validated this APK on-device, so it is not marked REAL + VERIFIED.")
+            } else {
+                status = "UNVERIFIED"
+                append("Backend did not provide a verified artifact. ${result.message}")
+            }
             busy = false
         }
     }
